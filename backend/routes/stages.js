@@ -1,8 +1,11 @@
+const { Router } = require('express');
 const { query } = require('../db');
 const { v4: uuidv4 } = require('uuid');
 
+const router = Router();
+
 // GET all stages
-async function getStages(req, res) {
+router.get('/', async (req, res) => {
   try {
     const result = await query('SELECT * FROM "tstages"');
     res.json(result.rows);
@@ -10,10 +13,10 @@ async function getStages(req, res) {
     console.error('Error fetching stages:', err);
     res.status(500).send(err.message);
   }
-}
+});
 
 // GET a single stage by ID
-async function getStageById(req, res) {
+router.get('/:id', async (req, res) => {
   try {
     const result = await query('SELECT * FROM "tstages" WHERE id = $1', [req.params.id]);
     if (result.rows.length > 0) {
@@ -24,10 +27,10 @@ async function getStageById(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
 // POST a new stage
-async function createStage(req, res) {
+router.post('/', async (req, res) => {
   if (!req.body) {
     return res.status(400).send('Request body is missing.');
   }
@@ -39,10 +42,10 @@ async function createStage(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
 // PUT (update) a stage
-async function updateStage(req, res) {
+router.put('/:id', async (req, res) => {
   if (!req.body) {
     return res.status(400).send('Request body is missing.');
   }
@@ -57,10 +60,10 @@ async function updateStage(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
 // DELETE a stage
-async function deleteStage(req, res) {
+router.delete('/:id', async (req, res) => {
   try {
     const result = await query('DELETE FROM "tstages" WHERE id = $1', [req.params.id]);
     if (result.rowCount > 0) {
@@ -72,12 +75,6 @@ async function deleteStage(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
-module.exports = {
-  getStages,
-  getStageById,
-  createStage,
-  updateStage,
-  deleteStage
-};
+module.exports = router;

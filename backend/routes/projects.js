@@ -1,8 +1,11 @@
+const { Router } = require('express');
 const { query } = require('../db');
 const { v4: uuidv4 } = require('uuid');
 
+const router = Router();
+
 // GET all projects
-async function getProjects(req, res) {
+router.get('/', async (req, res) => {
   try {
     const result = await query('SELECT "id", projectno, projectname, customername, "owner", projectdate, targetdate, dispatchmonth, productionstage, "remarks" FROM "tprojects"');
     res.json(result.rows);
@@ -10,10 +13,10 @@ async function getProjects(req, res) {
     console.error('Error fetching projects:', err);
     res.status(500).send(err.message);
   }
-}
+});
 
 // GET a single project by ID
-async function getProjectById(req, res) {
+router.get('/:id', async (req, res) => {
   try {
     const result = await query('SELECT * FROM "tprojects" WHERE "id" = $1', [req.params.id]);
     if (result.rows.length > 0) {
@@ -24,10 +27,10 @@ async function getProjectById(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
 // POST a new project
-async function createProject(req, res) {
+router.post('/', async (req, res) => {
   if (!req.body) {
     return res.status(400).send('Request body is missing.');
   }
@@ -39,10 +42,7 @@ async function createProject(req, res) {
   }
 
   try {
-    // Explicitly generate ID in backend
     const id = uuidv4();
-
-    // Ensure projectNo is a string and generate if not provided
     projectNo = String(projectNo || '').trim();
     projectName = String(projectName || '').trim();
     customerName = String(customerName || '').trim();
@@ -60,10 +60,10 @@ async function createProject(req, res) {
     console.error('Error creating project:', err);
     res.status(500).send(err.message);
   }
-}
+});
 
 // PUT (update) a project
-async function updateProject(req, res) {
+router.put('/:id', async (req, res) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).send('Request body is missing or empty.');
   }
@@ -99,12 +99,10 @@ async function updateProject(req, res) {
     return res.status(400).send('No valid fields to update.');
   }
 
-  queryParams.push(projectId); // Add project ID as the last parameter
+  queryParams.push(projectId);
 
   try {
     const updateQuery = `UPDATE "tprojects" SET ${setClauses.join(', ')} WHERE "id" = $${paramIndex} RETURNING *`;
-    console.log('updateQuery:', updateQuery);
-    console.log('queryParams:', queryParams);
     const result = await query(updateQuery, queryParams);
 
     if (result.rows.length > 0) {
@@ -116,10 +114,10 @@ async function updateProject(req, res) {
     console.error('Error updating project:', err);
     res.status(500).send(err.message);
   }
-}
+});
 
 // DELETE a project
-async function deleteProject(req, res) {
+router.delete('/:id', async (req, res) => {
   try {
     const result = await query('DELETE FROM "tprojects" WHERE "id" = $1', [req.params.id]);
     if (result.rowCount > 0) {
@@ -130,12 +128,6 @@ async function deleteProject(req, res) {
   } catch (err) {
     res.status(500).send(err.message);
   }
-}
+});
 
-module.exports = {
-  getProjects,
-  getProjectById,
-  createProject,
-  updateProject,
-  deleteProject
-};
+module.exports = router;

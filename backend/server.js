@@ -1,10 +1,12 @@
-
 require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { pool } = require('./db');
+
+const projectsRouter = require('./routes/projects');
+const stagesRouter = require('./routes/stages');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -14,107 +16,8 @@ app.use(cors());
 app.use(express.json());
 
 // API routes
-const { getProjects, getProjectById, createProject, updateProject, deleteProject } = require('./routes/projects');
-const { getStages, getStageById, createStage, updateStage, deleteStage } = require('./routes/stages');
-
-// API routes
-app.all('/api/projects*', async (req, res) => {
-  console.log('Projects route hit:', req.method, req.path);
-  const urlPath = req.path.replace('/api/', '');
-  const method = req.method.toLowerCase();
-  const idMatch = urlPath.match(/\/([a-f0-9-]+)$/i);
-  const id = idMatch ? idMatch[1] : null;
-
-  const mockReq = {
-    body: req.body,
-    params: { id: id },
-    query: req.query,
-    url: urlPath,
-    method: req.method
-  };
-
-  const mockRes = {
-    status: function (statusCode) {
-      this.statusCode = statusCode;
-      return this;
-    },
-    send: function (body) {
-      res.status(this.statusCode || 200).send(body);
-    },
-    json: function (body) {
-      res.status(this.statusCode || 200).json(body);
-    }
-  };
-
-  if (id) {
-    if (method === 'get') {
-      await getProjectById(mockReq, mockRes);
-    } else if (method === 'put') {
-      await updateProject(mockReq, mockRes);
-    } else if (method === 'delete') {
-      await deleteProject(mockReq, mockRes);
-    } else {
-      mockRes.status(404).send('Not Found');
-    }
-  } else {
-    if (method === 'get') {
-      await getProjects(mockReq, mockRes);
-    } else if (method === 'post') {
-      await createProject(mockReq, mockRes);
-    } else {
-      mockRes.status(404).send('Not Found');
-    }
-  }
-});
-
-app.all('/api/stages*', async (req, res) => {
-  console.log('Stages route hit:', req.method, req.path);
-  const urlPath = req.path.replace('/api/', '');
-  const method = req.method.toLowerCase();
-  const idMatch = urlPath.match(/\/([a-f0-9-]+)$/i);
-  const id = idMatch ? idMatch[1] : null;
-
-  const mockReq = {
-    body: req.body,
-    params: { id: id },
-    query: req.query,
-    url: urlPath,
-    method: req.method
-  };
-
-  const mockRes = {
-    status: function (statusCode) {
-      this.statusCode = statusCode;
-      return this;
-    },
-    send: function (body) {
-      res.status(this.statusCode || 200).send(body);
-    },
-    json: function (body) {
-      res.status(this.statusCode || 200).json(body);
-    }
-  };
-
-  if (id) {
-    if (method === 'get') {
-      await getStageById(mockReq, mockRes);
-    } else if (method === 'put') {
-      await updateStage(mockReq, mockRes);
-    } else if (method === 'delete') {
-      await deleteStage(mockReq, mockRes);
-    } else {
-      mockRes.status(404).send('Not Found');
-    }
-  } else {
-    if (method === 'get') {
-      await getStages(mockReq, mockRes);
-    } else if (method === 'post') {
-      await createStage(mockReq, mockRes);
-    } else {
-      mockRes.status(404).send('Not Found');
-    }
-  }
-});
+app.use('/api/projects', projectsRouter);
+app.use('/api/stages', stagesRouter);
 
 // Test DB connection
 app.get('/api/test-db', async (req, res) => {
