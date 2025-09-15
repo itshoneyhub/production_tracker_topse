@@ -19,6 +19,7 @@ const { getStages, getStageById, createStage, updateStage, deleteStage } = requi
 
 // API routes
 app.all('/api/projects*', async (req, res) => {
+  console.log('Projects route hit:', req.method, req.path);
   const urlPath = req.path.replace('/api/', '');
   const method = req.method.toLowerCase();
   const idMatch = urlPath.match(/\/([a-f0-9-]+)$/i);
@@ -67,6 +68,7 @@ app.all('/api/projects*', async (req, res) => {
 });
 
 app.all('/api/stages*', async (req, res) => {
+  console.log('Stages route hit:', req.method, req.path);
   const urlPath = req.path.replace('/api/', '');
   const method = req.method.toLowerCase();
   const idMatch = urlPath.match(/\/([a-f0-9-]+)$/i);
