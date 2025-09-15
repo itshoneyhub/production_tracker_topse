@@ -63,7 +63,7 @@ const Dashboard = () => {
 
   return (
     <div className="page-container">
-      <h2>Dashboard</h2>
+      <h2>TOPSE Dashboard</h2>
       <div className="dashboard-metrics">
         <div className="metric-card" onClick={() => handleCardClick('All')}>
           <h3>Total Projects</h3>

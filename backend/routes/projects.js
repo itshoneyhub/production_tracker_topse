@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 // GET all projects
 async function getProjects(req, res) {
   try {
-    const result = await query('SELECT "id", projectno, projectname, customername, "owner", projectdate, targetdate, dispatchmonth, productionstage, "remarks" FROM "projects"');
+    const result = await query('SELECT "id", projectno, projectname, customername, "owner", projectdate, targetdate, dispatchmonth, productionstage, "remarks" FROM "tprojects"');
     res.json(result.rows);
   } catch (err) {
     console.error('Error fetching projects:', err);
@@ -15,7 +15,7 @@ async function getProjects(req, res) {
 // GET a single project by ID
 async function getProjectById(req, res) {
   try {
-    const result = await query('SELECT * FROM "projects" WHERE "id" = $1', [req.params.id]);
+    const result = await query('SELECT * FROM "tprojects" WHERE "id" = $1', [req.params.id]);
     if (result.rows.length > 0) {
       res.json(result.rows[0]);
     } else {
@@ -52,7 +52,7 @@ async function createProject(req, res) {
     dispatchMonth = String(dispatchMonth || '').trim();
 
     const result = await query(
-      'INSERT INTO "projects" ("id", projectno, projectname, customername, "owner", projectdate, targetdate, dispatchmonth, productionstage, "remarks") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
+      'INSERT INTO "tprojects" ("id", projectno, projectname, customername, "owner", projectdate, targetdate, dispatchmonth, productionstage, "remarks") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *',
       [id, projectNo, projectName, customerName, owner, projectDate, targetDate, dispatchMonth, productionstage, remarks]
     );
     res.status(201).json(result.rows[0]);
@@ -102,7 +102,7 @@ async function updateProject(req, res) {
   queryParams.push(projectId); // Add project ID as the last parameter
 
   try {
-    const updateQuery = `UPDATE "projects" SET ${setClauses.join(', ')} WHERE "id" = $${paramIndex} RETURNING *`;
+    const updateQuery = `UPDATE "tprojects" SET ${setClauses.join(', ')} WHERE "id" = $${paramIndex} RETURNING *`;
     console.log('updateQuery:', updateQuery);
     console.log('queryParams:', queryParams);
     const result = await query(updateQuery, queryParams);
@@ -121,7 +121,7 @@ async function updateProject(req, res) {
 // DELETE a project
 async function deleteProject(req, res) {
   try {
-    const result = await query('DELETE FROM "projects" WHERE "id" = $1', [req.params.id]);
+    const result = await query('DELETE FROM "tprojects" WHERE "id" = $1', [req.params.id]);
     if (result.rowCount > 0) {
       res.send('Project deleted');
     } else {

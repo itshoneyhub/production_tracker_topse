@@ -1,4 +1,4 @@
-CREATE TABLE Projects (
+CREATE TABLE tprojects (
     id VARCHAR(255) PRIMARY KEY,
     projectNo VARCHAR(255) NOT NULL,
     projectName VARCHAR(255),
@@ -11,7 +11,7 @@ CREATE TABLE Projects (
     remarks TEXT
 );
 
-CREATE TABLE Stages (
+CREATE TABLE tstages (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     remarks TEXT
