@@ -4,7 +4,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
-const { poolPromise } = require('./db');
+const { pool } = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -119,9 +119,8 @@ app.all('/api/stages*', async (req, res) => {
 // Test DB connection
 app.get('/api/test-db', async (req, res) => {
   try {
-    const pool = await poolPromise;
-    const result = await pool.request().query('SELECT 1 AS number');
-    res.json(result.recordset);
+    const result = await pool.query('SELECT 1 AS number');
+    res.json(result.rows);
   } catch (err) {
     console.error('Database connection error:', err);
     res.status(500).send({ message: err.message });
